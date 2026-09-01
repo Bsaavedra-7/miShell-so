@@ -6,6 +6,16 @@
 
 int main(void) {
     
-    printf("Bienvenido a miShell\n");
+    while (1) {
+        char line[MAX_LINE];
+        printf("miShell> ");
+        if (fgets(line, sizeof(line), stdin) == NULL) {
+            break; 
+        }
+        
+        line[strcspn(line, "\n")] = 0;
+
+        printf("You entered: %s\n", line);
+    }
     return 0;
 }
