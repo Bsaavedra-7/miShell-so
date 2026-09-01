@@ -1,0 +1,8 @@
+#ejecutable principal
+mishell
+
+*.o
+
+*.swp
+*~
+.DS_Store
