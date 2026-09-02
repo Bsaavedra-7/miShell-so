@@ -9,6 +9,26 @@
 //  gcc mishell.c -o mishell
 //  ./mishell
 
+int tokenizar (char *line, char **args){
+
+    line[strcspn(line, "\n")] = 0; // Eliminar el salto de linea
+
+    //aca tokenizamos el comando, determinando espacios, tabs y salto de linea
+    char *token = strtok(line, "\t\r\n "); 
+
+    int i = 0;
+    //el ultimo arg tiene que ser null
+    while (token != NULL && i < MAX_ARGS - 1) {
+        args[i] = token;
+        token = strtok(NULL, "\t\r\n ");
+        i++;
+        printf("Token %d: %s\n", i, args[i-1]); // Imprimir cada token
+    }
+    args[i] = NULL;
+    return i;
+}
+
+
 
 int main(void) {
     
@@ -22,8 +42,10 @@ int main(void) {
     }
 
 
-
+    char *args[MAX_ARGS];
+    
     while (1) {
+
         char line[MAX_LINE];
         printf("miShell> ");
         if (fgets(line, sizeof(line), stdin) == NULL) {
@@ -31,6 +53,9 @@ int main(void) {
         }
         
         line[strcspn(line, "\n")] = 0;
+
+        int argc = tokenizar(line, args);
+        printf("Number of arguments: %d\n", argc);
 
         printf("You entered: %s\n", line);
     }
