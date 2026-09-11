@@ -3,6 +3,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include "shell.h"
+//#include "child.h"
 #include <unistd.h>
 
 
@@ -29,9 +30,9 @@ int tokenizar (char *line, char **args){
 }
 
 int main(void) {
-
+    int JOBS = 0;
     char cwd[1024];
-    Job * procesos[MAX_JOBS];
+    Job * processes[MAX_JOBS];
     char *args[MAX_ARGS];
     
     while (1) {
@@ -66,9 +67,9 @@ int main(void) {
             
             for (int i = 0; i < MAX_JOBS; i++) {
                 char *status = malloc(256), *cmd = malloc(256);
-                strcpy(cmd, procesos[i]->command); // TODO puede que tire error al 2do arg no ser const char *
-                long pid = (long)procesos[i]->job_id;
-                switch (procesos[i]->status) { // Unica forma que se de usar los nombres de los enum, quizas agregandoles un valor que sea su nombre??
+                strcpy(cmd, processes[i]->command); // TODO puede que tire error al 2do arg no ser const char *
+                long pid = (long)processes[i]->job_id;
+                switch (processes[i]->status) { // Unica forma que se de usar los nombres de los enum, quizas agregandoles un valor que sea su nombre??
                     case RUNNING:
                         strcpy(status, "RUNNING");
                         break;
@@ -93,9 +94,10 @@ int main(void) {
             continue; 
         }
 
-
-
-    }
+        if (JOBS < MAX_JOBS) { // Ejecutar comandos no built-in y crear instancia de Job respectivo
+            continue; // TODO implementar
+        }
+   }
 
 
 
