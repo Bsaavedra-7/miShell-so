@@ -57,6 +57,7 @@ int main(void) {
             if (chdir(args[1]) == -1) { // Cambia directorio, si falla retorna -1
                 printf("ERROR AL CAMBIAR DIRECTORIO");
             }
+            continue; // Salta al sgte ciclo IMPORTANTE
         }
 
         if (strcmp(args[0], "exit") == 0) {return 0;} // Cierra la shell
@@ -66,8 +67,8 @@ int main(void) {
             for (int i = 0; i < MAX_JOBS; i++) {
                 char *status = malloc(256), *cmd = malloc(256);
                 strcpy(cmd, procesos[i]->command); // TODO puede que tire error al 2do arg no ser const char *
-                long pid = procesos[i]->job_id;
-                switch (procesos[i]->status) {
+                long pid = (long)procesos[i]->job_id;
+                switch (procesos[i]->status) { // Unica forma que se de usar los nombres de los enum, quizas agregandoles un valor que sea su nombre??
                     case RUNNING:
                         strcpy(status, "RUNNING");
                         break;
@@ -81,11 +82,19 @@ int main(void) {
                         break;
                 }
 
-                printf("%ld, %s, %s", (long)procesos[i]->pid, procesos[i]);
+                printf("%ld, %s, %s", pid, cmd);
                 free(status);
                 free(cmd);
+                continue;
             }
         }
+
+        if (strcmp(args[0], "pmon") == 0) { // TODO esto, Que es seccion 3??
+            continue; 
+        }
+
+
+
     }
 
 
