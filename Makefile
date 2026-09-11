@@ -1,10 +1,9 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -std-gnu11
+CFLAGS = -Wall -Wextra -std=gnu11
 
-all: $(TARGET)
-
-$(TARGET): mishell.c
-	$(CC) $(CFLAGS) -o $(TARGET) mishell.c
+mishell:
+	$(CC) $(CFLAGS) mishell.c -o mishell
+	./mishell
 
 clean:
-	rm -f $(TARGET) *.o
+	rm -f mishell *.o

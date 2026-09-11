@@ -22,13 +22,11 @@ int tokenizar (char *line, char **args){
         args[i] = token;
         token = strtok(NULL, "\t\r\n ");
         i++;
-        printf("Token %d: %s\n", i, args[i-1]); // Imprimir cada token
-    }
+        }
+        
     args[i] = NULL;
     return i;
 }
-
-
 
 int main(void) {
     
@@ -41,13 +39,18 @@ int main(void) {
         return 1;
     }
 
+    Job * procesos[MAX_JOBS];
 
     char *args[MAX_ARGS];
     
     while (1) {
 
+        if (getcwd(cwd, sizeof(cwd)) == NULL) {
+            perror("getcwd() error"); return 1;
+        }
+
         char line[MAX_LINE];
-        printf("miShell> ");
+        printf("miShell:%s$ ", cwd);
         if (fgets(line, sizeof(line), stdin) == NULL) {
             break; 
         }
@@ -55,9 +58,43 @@ int main(void) {
         line[strcspn(line, "\n")] = 0;
 
         int argc = tokenizar(line, args);
-        printf("Number of arguments: %d\n", argc);
+        
+        //Si shell debe poder ejecutar cmd1 && cmd2 habra que hacer esto dentro de un ciclo
 
-        printf("You entered: %s\n", line);
+        if (strcmp(args[0], "cd") == 0) { // Comando es cd
+
+            if (chdir(args[1]) == -1) { // Cambia directorio, si falla retorna -1
+                printf("ERROR AL CAMBIAR DIRECTORIO");
+            }
+        }
+
+        if (strcmp(args[0], "exit") == 0) {return 0;} // Cierra la shell
+
+        if (strcmp(args[0], "jobs") == 0) { // TODO falta testear, no se si funcione en realidad
+            
+            for (int i = 0; i < MAX_JOBS; i++) {
+                char *status = malloc(256), *cmd = malloc(256);
+                strcpy(cmd, procesos[i]->command); // TODO puede que tire error al 2do arg no ser const char *
+                long pid = procesos[i]->job_id;
+                switch (procesos[i]->status) {
+                    case RUNNING:
+                        strcpy(status, "RUNNING");
+                        break;
+                    case STOPPED:
+                        strcpy(status, "STOPPED");
+                        break;
+                    case TERMINATED:
+                        strcpy(status, "TERMINATED");
+                        break;
+                    default:
+                        break;
+                }
+
+                print("%ld, %s, %s", (long)procesos[i]->pid, procesos[i]);
+                free(status);
+                free(cmd);
+            }
+        }
     }
 
 

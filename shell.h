@@ -4,9 +4,9 @@
 #include <sys/types.h>
 
 
-#define MAX_JOBS 100//maximo de trabajos que se pueden ejecutar al mismo tiempo
-#define MAX_ARGS 64//maximo de argumentos que puede tener un comando
-#define MAX_LINE 1024//maximo de caracteres que puede tener el comando
+#define MAX_JOBS 100 // maximo de trabajos que se pueden ejecutar al mismo tiempo
+#define MAX_ARGS 64 // maximo de argumentos que puede tener un comando
+#define MAX_LINE 1024 // maximo de caracteres que puede tener el comando
 
 
 
