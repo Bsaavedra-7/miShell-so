@@ -29,18 +29,9 @@ int tokenizar (char *line, char **args){
 }
 
 int main(void) {
-    
-    //ruta actual con getcwd
+
     char cwd[1024];
-    if (getcwd(cwd, sizeof(cwd)) != NULL) {
-        printf("Current working directory: %s\n", cwd);
-    } else {
-        perror("getcwd() error");
-        return 1;
-    }
-
     Job * procesos[MAX_JOBS];
-
     char *args[MAX_ARGS];
     
     while (1) {
@@ -90,7 +81,7 @@ int main(void) {
                         break;
                 }
 
-                print("%ld, %s, %s", (long)procesos[i]->pid, procesos[i]);
+                printf("%ld, %s, %s", (long)procesos[i]->pid, procesos[i]);
                 free(status);
                 free(cmd);
             }
