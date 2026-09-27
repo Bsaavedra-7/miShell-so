@@ -2,11 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
-//#include <sys/wait.h>
+#include <sys/wait.h>
 #include "shell.h"
 #include "child.h"
 #include <signal.h>
-//#include <unistd.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 //  gcc mishell.c -o mishell
 //  ./mishell
@@ -60,53 +61,77 @@ int main(void)
         line[strcspn(line, "\n")] = 0;
 
         int argc = tokenizar(line, args);
+        (void)argc; // Evita el warning de "unused variable" temporalmente
+        if (args[0] == NULL) {
+            continue;
+        }
 
         // Si shell debe poder ejecutar cmd1 && cmd2 habra que hacer esto dentro de un ciclo
 
         if (strcmp(args[0], "cd") == 0)
-        { // Comando es cd
+                { // Comando es cd
 
-            if (chdir(args[1]) == -1)
-            { // Cambia directorio, si falla retorna -1
-                printf("ERROR AL CAMBIAR DIRECTORIO");
-            }
-            continue; // Salta al sgte ciclo IMPORTANTE
-        }
+                    if (args[1] == NULL)
+                    { 
+                        // 1. Sin argumentos: va al directorio $HOME (exigido por la pauta)
+                        char *home = getenv("HOME");
+                        if (home != NULL)
+                        {
+                            chdir(home);
+                        }
+                    }
+                    else
+                    {
+                        // 2. Con argumento: cambia a la ruta indicada
+                        if (chdir(args[1]) != 0)
+                        { 
+                            // Muestra el error estándar del sistema (ej: "cd: No tal archivo o el directorio")
+                            perror("cd");
+                        }
+                    }
+                    continue; // Salta al sgte ciclo IMPORTANTE
+                }
 
         if (strcmp(args[0], "exit") == 0)
         {
-            return 0;
-        } // Cierra la shell
+            int exit_code = 0;
+            if (args[1] != NULL)
+            {
+                exit_code = atoi(args[1]);
+            }
+            exit(exit_code);
+        }
 
         if (strcmp(args[0], "jobs") == 0)
-        { // TODO falta testear, no se si funcione en realidad
+                {
+                    for (int i = 0; i < MAX_JOBS; i++)
+                    {
+                        // 1. Solo procesar las casillas que realmente tengan un proceso registrado
+                        if (processes[i] != NULL)
+                        {
+                            char status[32] = "UNKNOWN";
 
-            for (int i = 0; i < MAX_JOBS; i++)
-            {
-                char *status = malloc(256), *cmd = malloc(256);
-                strcpy(cmd, processes[i]->command); // TODO puede que tire error al 2do arg no ser const char *
-                long pid = (long)processes[i]->job_id;
-                switch (processes[i]->status)
-                { // Unica forma que se de usar los nombres de los enum, quizas agregandoles un valor que sea su nombre??
-                case RUNNING:
-                    strcpy(status, "RUNNING");
-                    break;
-                case STOPPED:
-                    strcpy(status, "STOPPED");
-                    break;
-                case TERMINATED:
-                    strcpy(status, "TERMINATED");
-                    break;
-                default:
-                    break;
+                            // 2. Convertir el enum a texto para imprimirlo
+                            switch (processes[i]->status)
+                            {
+                            case RUNNING:
+                                strcpy(status, "RUNNING");
+                                break;
+                            case STOPPED:
+                                strcpy(status, "STOPPED");
+                                break;
+                            case TERMINATED:
+                                strcpy(status, "TERMINATED");
+                                break;
+                            }
+
+                            // 3. Imprimir la información del trabajo directamente sin usar malloc
+                            printf("[%d] PID: %ld | Estado: %s | Comando: %s\n", 
+                                i + 1, (long)processes[i]->job_id, status, processes[i]->command);
+                        }
+                    }
+                    continue; // Salta al siguiente ciclo del while(1) para no hacer fork()
                 }
-
-                printf("%ld, %s, %s", pid, cmd);
-                free(status);
-                free(cmd);
-                continue;
-            }
-        }
 
         if (strcmp(args[0], "pmon") == 0)
         { 
@@ -123,11 +148,56 @@ int main(void)
 
         if (pid == 0)
         {
-            // hijo: restaurar señales
+            // --- MANEJO DE REDIRECCIONES (>, >>, <) ---
+            for (int i = 0; args[i] != NULL; i++)
+            {
+                if (strcmp(args[i], ">") == 0)
+                {
+                    int fd = open(args[i + 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+                    if (fd < 0)
+                    {
+                        perror("open salida");
+                        exit(1);
+                    }
+                    dup2(fd, STDOUT_FILENO);
+                    close(fd);
+                    args[i] = NULL;
+                    break;
+                }
+                else if (strcmp(args[i], ">>") == 0)
+                {
+                    int fd = open(args[i + 1], O_WRONLY | O_CREAT | O_APPEND, 0644);
+                    if (fd < 0)
+                    {
+                        perror("open salida append");
+                        exit(1);
+                    }
+                    dup2(fd, STDOUT_FILENO);
+                    close(fd);
+                    args[i] = NULL;
+                    break;
+                }
+                else if (strcmp(args[i], "<") == 0)
+                {
+                    int fd = open(args[i + 1], O_RDONLY);
+                    if (fd < 0)
+                    {
+                        perror("open entrada");
+                        exit(1);
+                    }
+                    dup2(fd, STDIN_FILENO);
+                    close(fd);
+                    args[i] = NULL;
+                    break;
+                }
+            }
+
+            // Ejecuta el comando limpio
             execvp(args[0], args);
-            perror(args[0]); // solo llega si execvp falla
+            perror(args[0]); // Solo llega aquí si execvp falla
             exit(1);
         }
+
         else
         {
             // padre: registrar job si es background, waitpid si es foreground

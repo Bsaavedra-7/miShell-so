@@ -1,8 +1,16 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -std=gnu11 -c
-SRCS = $(wildcard *.c)
-OBJS = $(SRCS:%.c=%.o)
-INC_DIRS := $(shell find -type d)
+CFLAGS = -Wall -Wextra -std=gnu11
 
-all:
-	$(CC) $(CFLAGS) $(SRCS) 
+all: mishell
+
+mishell: child.o mishell.o
+	$(CC) $(CFLAGS) -o mishell child.o mishell.o
+
+child.o: child.c
+	$(CC) $(CFLAGS) -c child.c
+
+mishell.o: mishell.c
+	$(CC) $(CFLAGS) -c mishell.c
+
+clean:
+	rm -f *.o mishell

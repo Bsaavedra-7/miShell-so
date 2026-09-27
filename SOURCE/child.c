@@ -13,5 +13,5 @@ Job execute(char **args) {
     //process.job_id = JOBS;
     //process.command = args[0];
     //++JOBS;
-
+    return (Job){0};
 }
