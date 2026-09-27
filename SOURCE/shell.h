@@ -33,4 +33,15 @@ typedef struct {
 }Job;
 
 
+
+//Estructura para representar un comando
+typedef struct {
+    char *command; //Comando
+    char **args; // Argumentos 
+    char **input; // entrada del comando, si no se define es NULL
+    char **output; // salida del comando, si no se define es NULL y debe ir por consola
+    
+}Command, *Command;
+
+
 #endif
