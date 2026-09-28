@@ -9,7 +9,7 @@
 #define MAX_ARGS 64 // maximo de argumentos que puede tener un comando
 #define MAX_LINE 1024 // maximo de caracteres que puede tener el comando
 #define MAX_ARG_LEN 30
-#define MAX_COMMANDS_IN_LINE 30
+#define MAX_COMMANDS_IN_LINE 60
 
 #define PIPE_READ 0 // Para uso en pipes creadas ej ptc[PIPE_READ] (parent to child) sera para leer contenido desde el padre al hijo
 #define PIPE_WRITE 1 // Para uso en pipes creadas, ver ej arriba
