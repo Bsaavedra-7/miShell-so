@@ -7,6 +7,17 @@
 #include "separateCommands.h"
 #include "validar.h" //  funciones para validar los comandos
 
+void job_add(pid_t pids, Command ** commands, Job ** processes) {
+    int i = 0;
+    while (1) {
+        
+        ++i;
+        if (commands[i]->pipe == 0) { // Termina de recorrer array en elemento donde var pipe = 0, siempre este sera el ultimo elemento (o unico)
+            break;
+        }
+    }
+
+}
 
 // Funcion para ejecutar comandos builtin y otros comandos
 void execute(struct Command *** commands, Job ** processes, int comQuant) {
@@ -72,13 +83,7 @@ void execute(struct Command *** commands, Job ** processes, int comQuant) {
                 }
 
                 long job_id = (long)processes[i]->job_id;
-
-                //  mostramos el estado sin reservar memoria
-                // ya no necesitamos utilizar malloc ni free
-                printf("[%ld] %s %s\n",
-                       job_id,
-                       status,
-                       processes[i]->command);
+                printf("[%ld] %s %s\n", job_id, status, processes[i]->command);
             }
             continue;
 
@@ -95,20 +100,8 @@ void execute(struct Command *** commands, Job ** processes, int comQuant) {
                 continue;
             }
 
-            // Desde aqui se ejecutan los comandos que no son builtin
-
-            pid_t pid = fork();
-
-            if (pid < 0) {
-                perror("fork");
-                continue;
-            }
-
-            if (pid == 0) {
-                // CHILD
-
-            } else {
-                // PARENT
+            if (JOBS == MAX_JOBS) {
+                printf("Limite de procesos activos alcanzado : %d\n", MAX_JOBS)
             }
 
             ++j;

@@ -40,7 +40,8 @@ int sepCmds(char **args, Command *** commands, int argq) { // Diferencia comando
             if (strcmp(args[i], "|") == 0) {
                 Command * commandFinished = (Command *) malloc(sizeof(Command) * MAX_COMMANDS_IN_LINE);
                 commandFinished->outfile = malloc(1); // Para desacoplar outfile y args, por algun motivo se acoplaron solas??
-                char ** cargs = (char**)malloc(sizeof(*commandUnfinished.args) * argsq);
+                char ** cargs = (char**)malloc(sizeof(*commandUnfinished.args) * (argsq + 1));
+                cargs[argsq] = NULL;
                 copy_array(cargs, commandUnfinished.args, argsq);
                 commandFinished->args = cargs;
                 char * ccmd = malloc(strlen(commandUnfinished.command) + 1);
@@ -99,7 +100,8 @@ int sepCmds(char **args, Command *** commands, int argq) { // Diferencia comando
             if (strcmp(args[i], "&&") == 0) {
                 Command * commandFinished = (Command *) malloc(sizeof(Command));
                 commandFinished->outfile = malloc(1);
-                char ** cargs = (char**)malloc(sizeof(*commandUnfinished.args) * argsq);
+                char ** cargs = (char**)malloc(sizeof(*commandUnfinished.args) * (argsq + 1));
+                cargs[argsq] = NULL;
                 copy_array(cargs, commandUnfinished.args, argsq);
                 commandFinished->args = cargs;
                 char * ccmd = malloc(strlen(commandUnfinished.command) + 1);
@@ -170,7 +172,8 @@ int sepCmds(char **args, Command *** commands, int argq) { // Diferencia comando
     }
     Command * commandFinished = (Command *) malloc(sizeof(Command));
     commandFinished->outfile = malloc(1);
-    char ** cargs = (char**)malloc(sizeof(*commandUnfinished.args) * argsq);
+    char ** cargs = (char**)malloc(sizeof(*commandUnfinished.args) * (argsq + 1));
+    cargs[argsq] = NULL;
     copy_array(cargs, commandUnfinished.args, argsq);
     commandFinished->args = cargs;
     char * ccmd = malloc(strlen(commandUnfinished.command) + 1);
