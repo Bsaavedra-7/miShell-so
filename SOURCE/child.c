@@ -103,7 +103,7 @@ void execute(struct Command *** commands, Job ** processes, int comQuant) {
             }
 
             if (!es_comando(command->command)) {
-                printf("Comando no enconrtrado: %s\n", command->command);
+                printf("Comando no encontrado");
                 continue;
             }
 

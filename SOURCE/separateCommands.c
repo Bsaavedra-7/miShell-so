@@ -187,7 +187,6 @@ int sepCmds(char **args, Command *** commands, int argq) { // Diferencia comando
     commandFinished->outfile = coutfile;
     commandFinished->argsq = argsq;
 
-
     if (commandUnfinished.infileAppend == 0) {
         commandFinished->infileAppend = 0;
     } else {commandFinished->infileAppend = 1;}
