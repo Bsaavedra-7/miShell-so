@@ -14,7 +14,7 @@ mishell.c = orquestador (loop + builtins + signals)
 */
 
 // esta funcion recibe el pipeline parseado, y crea lkos procesos hijos, conecta pipes y decide si es foreground o background
-int execute_pipeline(Command **pipeline, int ncmds, int background)
+int execute_pipeline(struct Command **pipeline, int ncmds, int background)
 {
 
     pid_t pids[ncmds];
@@ -117,7 +117,7 @@ char **build_argv(Command *cmd){
 }
 
 
-void free_command(Command *cmd){
+void free_command(struct Command *cmd){
    for (int i = 0; i < ncmds; i++){
     // liberar memoria de cada comando
     free(cmd[i]->command);
