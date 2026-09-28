@@ -43,6 +43,7 @@ typedef struct {
     char *command; //Comando
     char **args; // Argumentos 
     char **input; // entrada del comando, si no se define es NULL
+    int inputAppend; // Para diferenciar > de >>
     char **output; // salida del comando, si no se define es NULL y debe ir por consola
     JobRunType jobRunType; // Para diferenciar si es foreground o background
 
