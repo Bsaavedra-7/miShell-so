@@ -3,6 +3,6 @@
 #include "shell.h"
 #include <stdio.h>
 
-int sepCmds(char **args, Command ** commands, int argq);
+int sepCmds(char **args, struct Command *** commands, int argq);
 
 #endif
