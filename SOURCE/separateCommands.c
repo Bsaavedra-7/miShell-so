@@ -18,10 +18,10 @@ void copy_array(char **to, char **from, int n) {
 
 
 // Separa argumentos en comandos y pipes de comandos
-int sepCmds(char **args, struct Command *** commands, int argq) { // Diferencia comandos de argumentos
+int sepCmds(char **args, Command *** commands, int argq) { // Diferencia comandos de argumentos
     const char* builtins[] = {"cd", "exit", "jobs", "pmon"};
     int builtinsq = 4;
-    struct Command commandUnfinished; // para despues hacer malloc y añadirlo al array
+    Command commandUnfinished; // para despues hacer malloc y añadirlo al array
     commandUnfinished.jobRunType = FOREGROUND;
     int commandsq = 0, endOfCommand = 0, isPipe = 0, skipLoop = 0, nextCommandisBackground = 0;
     int argsq = 0; // variable para contar argumentos de cada comando
@@ -29,34 +29,34 @@ int sepCmds(char **args, struct Command *** commands, int argq) { // Diferencia 
     // inicializacion de instancia 
     commandUnfinished.args = commandArgs;
     commandUnfinished.command = "";
-    commandUnfinished.input = "";
-    commandUnfinished.inputAppend = 0;
+    commandUnfinished.infile = "";
+    commandUnfinished.infileAppend = 0;
     commandUnfinished.jobRunType = FOREGROUND;
-    commandUnfinished.output = "";
+    commandUnfinished.outfile = "";
     // 
     for (int i = 0; i < argq; i++) {
         if (skipLoop == 1) {skipLoop = 0; continue;}      
         if (!es_comando(args[i])) { // Si no es un comando
             if (strcmp(args[i], "|") == 0) {
-                struct Command * commandFinished = (struct Command *) malloc(sizeof(struct Command) * MAX_COMMANDS_IN_LINE);
-                commandFinished->output = malloc(1); // Para desacoplar output y args, por algun motivo se acoplaron solas??
+                Command * commandFinished = (Command *) malloc(sizeof(Command) * MAX_COMMANDS_IN_LINE);
+                commandFinished->outfile = malloc(1); // Para desacoplar outfile y args, por algun motivo se acoplaron solas??
                 char ** cargs = (char**)malloc(sizeof(*commandUnfinished.args) * argsq);
                 copy_array(cargs, commandUnfinished.args, argsq);
                 commandFinished->args = cargs;
                 char * ccmd = malloc(strlen(commandUnfinished.command) + 1);
                 strcpy(ccmd, commandUnfinished.command);
                     commandFinished->command = ccmd;
-                char * cinput = malloc(strlen(commandUnfinished.input) + 1);
-                strcpy(cinput, commandUnfinished.input);
-                commandFinished->input = cinput;
-                char * coutput = malloc(strlen(commandUnfinished.output) + 1);
-                strcpy(coutput, commandUnfinished.output);
-                commandFinished->output = coutput;
+                char * cinfile = malloc(strlen(commandUnfinished.infile) + 1);
+                strcpy(cinfile, commandUnfinished.infile);
+                commandFinished->infile = cinfile;
+                char * coutfile = malloc(strlen(commandUnfinished.outfile) + 1);
+                strcpy(coutfile, commandUnfinished.outfile);
+                commandFinished->outfile = coutfile;
                 commandFinished->argsq = argsq;
 
-                if (commandUnfinished.inputAppend == 0) {
-                    commandFinished->inputAppend = 0;
-                } else {commandFinished->inputAppend = 1;}
+                if (commandUnfinished.infileAppend == 0) {
+                    commandFinished->infileAppend = 0;
+                } else {commandFinished->infileAppend = 1;}
                 if (commandUnfinished.jobRunType == BACKGROUND) {
                     commandFinished->jobRunType = BACKGROUND;
                 } else {commandFinished->jobRunType = FOREGROUND;}
@@ -66,23 +66,23 @@ int sepCmds(char **args, struct Command *** commands, int argq) { // Diferencia 
                 ++isPipe; 
 
                 commandUnfinished.command = "";
-                commandUnfinished.input = "";
-                commandUnfinished.inputAppend = 0;
+                commandUnfinished.infile = "";
+                commandUnfinished.infileAppend = 0;
                 commandUnfinished.jobRunType = FOREGROUND;
-                commandUnfinished.output = "";
+                commandUnfinished.outfile = "";
                 commandArgs = (char **) malloc(sizeof(char **) * MAX_ARGS);
                 argsq = 0;
                 continue;
             } 
             if (strcmp(args[i], ">") == 0) {
                 commandUnfinished.outfile = args[i + 1]; 
-                commandUnfinished.inputAppend = 0;
+                commandUnfinished.infileAppend = 0;
                 skipLoop = 1;
                 continue;
             }
             if (strcmp(args[i], ">>") == 0) {
-                commandUnfinished.appendfile = args[i + 1];
-                commandUnfinished.inputAppend = 1;
+                commandUnfinished.infile = args[i + 1];
+                commandUnfinished.infileAppend = 1;
                 skipLoop = 1;
                 continue;
             }
@@ -97,44 +97,44 @@ int sepCmds(char **args, struct Command *** commands, int argq) { // Diferencia 
 
             }
             if (strcmp(args[i], "&&") == 0) {
-                struct Command * commandFinished = (struct Command *) malloc(sizeof(struct Command));
-                commandFinished->output = malloc(1);
+                Command * commandFinished = (Command *) malloc(sizeof(Command));
+                commandFinished->outfile = malloc(1);
                 char ** cargs = (char**)malloc(sizeof(*commandUnfinished.args) * argsq);
                 copy_array(cargs, commandUnfinished.args, argsq);
                 commandFinished->args = cargs;
                 char * ccmd = malloc(strlen(commandUnfinished.command) + 1);
                 strcpy(ccmd, commandUnfinished.command);
                 commandFinished->command = ccmd;
-                char * cinput = malloc(strlen(commandUnfinished.input) + 1);
-                strcpy(cinput, commandUnfinished.input);
-                commandFinished->input = cinput;
-                char * coutput = malloc(strlen(commandUnfinished.output) + 1);
-                strcpy(coutput, commandUnfinished.output);
-                commandFinished->output = coutput;
+                char * cinfile = malloc(strlen(commandUnfinished.infile) + 1);
+                strcpy(cinfile, commandUnfinished.infile);
+                commandFinished->infile = cinfile;
+                char * coutfile = malloc(strlen(commandUnfinished.outfile) + 1);
+                strcpy(coutfile, commandUnfinished.outfile);
+                commandFinished->outfile = coutfile;
                 commandFinished->argsq = argsq;
                 argsq = 0;
                 commandFinished->pipe = 0;
 
-                if (commandUnfinished.inputAppend == 0) {
-                    commandFinished->inputAppend = 0;
-                } else {commandFinished->inputAppend = 1;}
+                if (commandUnfinished.infileAppend == 0) {
+                    commandFinished->infileAppend = 0;
+                } else {commandFinished->infileAppend = 1;}
                 if (commandUnfinished.jobRunType == BACKGROUND) {
                     commandFinished->jobRunType = BACKGROUND;
                 } else {commandFinished->jobRunType = FOREGROUND;}
                 commands[commandsq - 1][isPipe] = commandFinished; 
 
                 commandUnfinished.command = "";
-                commandUnfinished.input = "";
-                commandUnfinished.inputAppend = 0;
+                commandUnfinished.infile = "";
+                commandUnfinished.infileAppend = 0;
                 commandUnfinished.jobRunType = FOREGROUND;
-                commandUnfinished.output = "";
+                commandUnfinished.outfile = "";
                 commandArgs = (char **) malloc(sizeof(char **) * MAX_ARGS);
                 commandUnfinished.args = commandArgs;
                 commandUnfinished.command = "";
-                commandUnfinished.input = "";
-                commandUnfinished.inputAppend = 0;
+                commandUnfinished.infile = "";
+                commandUnfinished.infileAppend = 0;
                 commandUnfinished.jobRunType = FOREGROUND;
-                commandUnfinished.output = "";
+                commandUnfinished.outfile = "";
                 isPipe = 0;
                 continue;
             }
@@ -147,7 +147,7 @@ int sepCmds(char **args, struct Command *** commands, int argq) { // Diferencia 
         } else { // Si es comando
             argsq = 0;
             if (isPipe == 0) {
-                commands[commandsq] =  (struct Command **) malloc(sizeof(struct Command*) * MAX_COMMANDS_IN_LINE);
+                commands[commandsq] =  (Command **) malloc(sizeof(Command*) * MAX_COMMANDS_IN_LINE);
                 ++commandsq;
             } 
             if (strcmp(commandUnfinished.command, "") == 0) {
@@ -168,26 +168,26 @@ int sepCmds(char **args, struct Command *** commands, int argq) { // Diferencia 
         }
 
     }
-    struct Command * commandFinished = (struct Command *) malloc(sizeof(struct Command));
-    commandFinished->output = malloc(1);
+    Command * commandFinished = (Command *) malloc(sizeof(Command));
+    commandFinished->outfile = malloc(1);
     char ** cargs = (char**)malloc(sizeof(*commandUnfinished.args) * argsq);
     copy_array(cargs, commandUnfinished.args, argsq);
     commandFinished->args = cargs;
     char * ccmd = malloc(strlen(commandUnfinished.command) + 1);
     strcpy(ccmd, commandUnfinished.command);
     commandFinished->command = ccmd;
-    char * cinput = malloc(strlen(commandUnfinished.input) + 1);
-    strcpy(cinput, commandUnfinished.input);
-    commandFinished->input = cinput;
-    char * coutput = malloc(strlen(commandUnfinished.output) + 1);
-    strcpy(coutput, commandUnfinished.output);
-    commandFinished->output = coutput;
+    char * cinfile = malloc(strlen(commandUnfinished.infile) + 1);
+    strcpy(cinfile, commandUnfinished.infile);
+    commandFinished->infile = cinfile;
+    char * coutfile = malloc(strlen(commandUnfinished.outfile) + 1);
+    strcpy(coutfile, commandUnfinished.outfile);
+    commandFinished->outfile = coutfile;
     commandFinished->argsq = argsq;
 
 
-    if (commandUnfinished.inputAppend == 0) {
-        commandFinished->inputAppend = 0;
-    } else {commandFinished->inputAppend = 1;}
+    if (commandUnfinished.infileAppend == 0) {
+        commandFinished->infileAppend = 0;
+    } else {commandFinished->infileAppend = 1;}
     if (commandUnfinished.jobRunType == BACKGROUND) {
         commandFinished->jobRunType = BACKGROUND;
     } else {commandFinished->jobRunType = FOREGROUND;}
@@ -195,19 +195,19 @@ int sepCmds(char **args, struct Command *** commands, int argq) { // Diferencia 
     commands[commandsq - 1][isPipe] = commandFinished; 
 
     commandUnfinished.command = "";
-    commandUnfinished.input = "";
-    commandUnfinished.inputAppend = 0;
+    commandUnfinished.infile = "";
+    commandUnfinished.infileAppend = 0;
     commandUnfinished.jobRunType = FOREGROUND;
-    commandUnfinished.output = "";
+    commandUnfinished.outfile = "";
     commandArgs = (char **) malloc(sizeof(char **) * MAX_ARGS);
     commandUnfinished.args = commandArgs;
     commandUnfinished.command = "";
-    commandUnfinished.input = "";
-    commandUnfinished.inputAppend = 0;
+    commandUnfinished.infile = "";
+    commandUnfinished.infileAppend = 0;
     commandUnfinished.jobRunType = FOREGROUND;
-    commandUnfinished.output = "";
-    struct Command* a = commands[0][1];
-    struct Command* b = commands[1][0];
+    commandUnfinished.outfile = "";
+    Command* a = commands[0][1];
+    Command* b = commands[1][0];
 
     return commandsq;
     

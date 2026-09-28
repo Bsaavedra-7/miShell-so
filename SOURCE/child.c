@@ -82,18 +82,35 @@ void execute(struct Command *** commands, Job ** processes, int comQuant) {
                        processes[i]->command);
             }
             continue;
-        }
 
-        if (strcmp(command->command, "pmon") == 0)
-        { 
-            // TODO: implementar monitor de procesos
-            continue;
-        }
+            }
 
-        if (!es_comando(command->command)) {
-            printf("Comando no enconrtrado: %s\n", command->command);
-            continue;
-        }
+            if (strcmp(command->command, "pmon") == 0)
+            { 
+                // TODO: implementar monitor de procesos
+                continue;
+            }
+
+            if (!es_comando(command->command)) {
+                printf("Comando no enconrtrado: %s\n", command->command);
+                continue;
+            }
+
+            // Desde aqui se ejecutan los comandos que no son builtin
+
+            pid_t pid = fork();
+
+            if (pid < 0) {
+                perror("fork");
+                continue;
+            }
+
+            if (pid == 0) {
+                // CHILD
+                
+            } else {
+                // PARENT
+            }
 
         }
 
