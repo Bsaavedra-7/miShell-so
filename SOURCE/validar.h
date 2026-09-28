@@ -1,7 +1,10 @@
+
 #ifndef VALIDAR_H
 #define VALIDAR_H
 
-// ejecuta el comando ingresado por el usuario
-void ejecutar_comando(char **args);
+#include <stdbool.h>
+
+// verifica si existe un programa ejecutable
+bool es_comando(const char *comando);
 
 #endif
