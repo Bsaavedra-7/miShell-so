@@ -68,7 +68,7 @@ int main(void)
         line[strcspn(line, "\n")] = 0;
 
         int argc = tokenizar(line, args);
-        Command **commands = malloc(sizeof(Command)); // Arreglo que contiene comandos, pipes vienen como arreglos con c/cmd, comandos solos vienen en un arreglo solos
+        struct Command **commands = malloc(sizeof(char*) * MAX_COMMANDS_IN_LINE); // Arreglo que contiene comandos, pipes vienen como arreglos con c/cmd, comandos solos vienen en un arreglo solos
 
         //  verificamos que el usuario haya ingresado un comando
         // si solo presiona Enter, volvemos a mostrar el prompt
