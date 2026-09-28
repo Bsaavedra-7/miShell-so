@@ -40,7 +40,7 @@ typedef enum {
 }JobRunType;
 
 //Estructura para representar un comando
-struct Command {
+typedef struct Command {
     char *command; //Comando
     char **args; // Argumentos 
     char *infile; // entrada del comando, si no se define es NULL
@@ -51,7 +51,6 @@ struct Command {
     int argsq; // Cantidad de argumentos
     int pipe; // Para saber es parte de un pipe, si no lo es o es el ultimo comando sera 0, si no 1
 
-};
-
+} Command;
 
 #endif

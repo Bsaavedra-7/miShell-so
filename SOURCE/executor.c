@@ -117,6 +117,7 @@ char **build_argv(Command *cmd){
 }
 
 
+
 void free_command(struct Command *cmd){
    for (int i = 0; i < ncmds; i++){
     // liberar memoria de cada comando

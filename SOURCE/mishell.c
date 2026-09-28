@@ -7,7 +7,8 @@
 #include "child.h"
 #include <signal.h>
 #include <unistd.h>
-#include "executor.h"   
+#include "executor.h" 
+#include "separateCommands.h"  
 
 //  gcc mishell.c -o mishell
 //  ./mishell
@@ -62,7 +63,7 @@ int main(void)
 
         int argc = tokenizar(line, args);
 
-        Command **commands = NULL;
+/*        Command **commands = NULL;
         int ncmds = sepCmds(args, &commands, argc);
 
         // DEBUG TEMPORAL- ver que parseo se hizo
@@ -76,7 +77,7 @@ int main(void)
                 }
             }
         }
-
+*/
         // Si shell debe poder ejecutar cmd1 && cmd2 habra que hacer esto dentro de un ciclo
 
         if (strcmp(args[0], "cd") == 0)
@@ -107,7 +108,7 @@ int main(void)
                 case RUNNING:
                     strcpy(status, "RUNNING");
                     break;
-                case STOPPED:
+                case STOPPED:   
                     strcpy(status, "STOPPED");
                     break;
                 case TERMINATED:
@@ -128,13 +129,14 @@ int main(void)
         { 
             continue;
         }
+        /*
         if (ncmds > 0) {
             int background = (commands[ncmds-1][0]->jobRunType == BACKGROUND);
             int ret = execute_pipeline(commands, ncmds, background);
             free_commands(commands, ncmds);
         }
         continue;
-
+        */
         pid_t pid = fork();
 
         if (pid < 0)
