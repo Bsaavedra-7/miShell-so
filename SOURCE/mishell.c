@@ -102,7 +102,7 @@ int main(void)
                     break;
                 }
 
-                printf("%ld, %s, %s", pid, cmd);
+                printf("%ld, %s, *char", pid, cmd);
                 free(status);
                 free(cmd);
                 continue;

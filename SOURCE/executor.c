@@ -5,6 +5,7 @@
 #include <sys/wait.h>
 #include <signal.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 /*
 separateCommands.c = parser (texto → structs)
@@ -13,17 +14,17 @@ mishell.c = orquestador (loop + builtins + signals)
 */
 
 // esta funcion recibe el pipeline parseado, y crea lkos procesos hijos, conecta pipes y decide si es foreground o background
-int executor_pipeline(Command **pipeline, int ncmds, int background)
+int execute_pipeline(Command **pipeline, int ncmds, int background)
 {
 
     pid_t pids[ncmds];
-    int pipefd;
+    int pipefd[2];
     int prev_fd = -1; // lector del pipe ante3rior
 
-    for (int i = 0; i ncmds; i++)
+    for (int i = 0; i < ncmds; i++)
     {
         Command *cmd = pipeline[i];
-        int is_last = (i = ncmds - 1);
+        int is_last = (i == ncmds - 1);
 
         // si no es ultimo comando crear pipe
         if (!is_last)
