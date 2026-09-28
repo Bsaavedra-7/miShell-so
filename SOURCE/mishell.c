@@ -40,7 +40,7 @@ int main(void)
 {
     
     char cwd[1024];
-    Job *processes[MAX_JOBS] = {NULL};// por esto fallaba, no estaba inicializadp
+    Job *processes[MAX_JOBS] = {NULL};
     char *args[MAX_ARGS];
 
     while (1)
@@ -71,34 +71,8 @@ int main(void)
         }
         int commandQuantity = sepCmds(args, commands, argc);
 
-        // TODO: integrar separateCommands para separar los comandos
-        // cuando existan pipes o redirecciones
-
         execute(commands, processes, commandQuantity);
 
-        // si el comando es valido, creamos el proceso hijo
-        pid_t pid = fork();
-
-        if (pid < 0)
-        {
-            perror("fork");
-            continue;
-        }
-
-        if (pid == 0)
-        {
-            // hijo: restaurar señales
-            execvp(args[0], args);
-            perror(args[0]); // solo llega si execvp falla
-            exit(1);
-        }
-        
-        else
-        {
-            // padre: registrar job si es background, waitpid si es foreground
-            // (waitpid por ahora, & se implementa en R5)
-            waitpid(pid, NULL, 0);
-        }
     }
 
     return 0;

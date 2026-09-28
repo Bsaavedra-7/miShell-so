@@ -35,7 +35,6 @@ void execute(struct Command *** commands, Job ** processes, int comQuant) {
                 return 0;
             }
 
-            ++j;
             if (command->pipe == 0) {break;}
 
             
@@ -107,10 +106,13 @@ void execute(struct Command *** commands, Job ** processes, int comQuant) {
 
             if (pid == 0) {
                 // CHILD
-                
+
             } else {
                 // PARENT
             }
+
+            ++j;
+            if (j == comQuant) {break;}
 
         }
 
