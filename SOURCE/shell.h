@@ -26,7 +26,7 @@ typedef enum {
 
 //Estructura para representar un trabajo
 typedef struct {
-    int job_id;
+    int job_id; // ID de proceso, empezando desde 0 hasta MAX_JOBS - 1
     pid_t pid;
     char *command;
     JobStatus status;

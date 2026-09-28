@@ -7,14 +7,21 @@
 #include "separateCommands.h"
 #include "validar.h" //  funciones para validar los comandos
 
-void job_add(pid_t pids, Command ** commands, Job ** processes) {
+// Funcion para agregar proceso a array de procesos
+void job_add(pid_t pids, Command ** commands, Job ** processes) { 
     int i = 0;
     while (1) {
-        
-        ++i;
+        processes[JOBS] = malloc(sizeof(Job));
+        processes[JOBS]->command = commands[i]->command;
+        processes[JOBS]->job_id = JOBS;
+        processes[JOBS]->pid = pids;
+        processes[JOBS]->status = RUNNING;
+        ++JOBS;
+
         if (commands[i]->pipe == 0) { // Termina de recorrer array en elemento donde var pipe = 0, siempre este sera el ultimo elemento (o unico)
             break;
         }
+        ++i;
     }
 
 }
@@ -101,7 +108,8 @@ void execute(struct Command *** commands, Job ** processes, int comQuant) {
             }
 
             if (JOBS == MAX_JOBS) {
-                printf("Limite de procesos activos alcanzado : %d\n", MAX_JOBS)
+                printf("Limite de procesos activos alcanzado : %d\n", MAX_JOBS);
+                break;
             }
 
             ++j;
