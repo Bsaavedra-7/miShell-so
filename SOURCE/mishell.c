@@ -7,6 +7,7 @@
 #include "child.h"
 #include <signal.h>
 #include <unistd.h>
+#include "executor.h"   
 
 //  gcc mishell.c -o mishell
 //  ./mishell
