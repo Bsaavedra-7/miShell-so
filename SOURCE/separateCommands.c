@@ -145,18 +145,6 @@ int sepCmds(char **args, Command *** commands, int argq) { // Diferencia comando
             commandArgs = (char *) malloc(sizeof(char *) * MAX_ARG_LEN * MAX_ARGS);
             ++commandsq;
         }
-        int aux = 0;
-        for (int j = 0; j < argq; j++) { // Ciclo para comparar con builtins
-
-            if (strcmp(args[i], builtins[j]) == 0) {
-                commandUnfinished->command = args[i];   
-                ++commandsq;
-                aux = 1;
-                break;
-            }
-            
-        }
-        if (aux == 1) {continue;}
         if (strcmp(args[i], "&") == 0) {
             isPipe = 0;
             commandUnfinished->jobRunType = BACKGROUND;
