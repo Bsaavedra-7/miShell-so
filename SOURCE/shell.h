@@ -47,6 +47,8 @@ typedef struct {
     int inputAppend; // Para diferenciar > de >>
     char *output; // salida del comando, si no se define es NULL y debe ir por consola
     JobRunType jobRunType; // Para diferenciar si es foreground o background
+    int argsq; // Cantidad de argumentos
+    int pipe; // Para saber es parte de un pipe, si no lo es o es el ultimo comando sera 0, si no 1
 
 }Command, *Command;
 

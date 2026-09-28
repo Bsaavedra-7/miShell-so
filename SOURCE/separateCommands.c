@@ -33,10 +33,9 @@ int sepCmds(char **args, Command ** commands, int argq) { // Diferencia comandos
     commandUnfinished->output = "";
     // 
     for (int i = 0; i < argq; i++) {
-        if (skipLoop == 1) {skipLoop = 0; continue;}
+        if (skipLoop == 1) {skipLoop = 0; continue;}      
         if (!es_comando(args[i])) { // Si no es un comando
             if (strcmp(args[i], "|") == 0) {
-                argsq = 0;
                 Command commandFinished = (Command) malloc(sizeof(Command));
                 char ** cargs = malloc(sizeof(commandUnfinished->args));
                 copy_array(cargs, commandUnfinished->args, argsq);
@@ -50,6 +49,7 @@ int sepCmds(char **args, Command ** commands, int argq) { // Diferencia comandos
                 char * coutput = malloc(sizeof(commandUnfinished->output));
                 strcpy(coutput, commandUnfinished->output);
                 commandFinished->output = coutput;
+                commandFinished->argsq = argsq;
 
                 if (commandUnfinished->input == 0) {
                     commandFinished->input = 0;
@@ -57,6 +57,8 @@ int sepCmds(char **args, Command ** commands, int argq) { // Diferencia comandos
                 if (commandUnfinished->jobRunType == BACKGROUND) {
                     commandFinished->jobRunType = BACKGROUND;
                 } else {commandFinished->jobRunType = FOREGROUND;}
+                
+                commandFinished->pipe = 1;
                 
                 commands[commandsq - 1] =  realloc(commands[commandsq -1], sizeof(commands[commandsq - 1]) + sizeof(commandFinished));
                 commands[commandsq][isPipe] = commandFinished; 
@@ -68,6 +70,7 @@ int sepCmds(char **args, Command ** commands, int argq) { // Diferencia comandos
                 commandUnfinished->jobRunType = FOREGROUND;
                 commandUnfinished->output = "";
                 commandArgs = (char *) malloc(sizeof(char *) * MAX_ARG_LEN * MAX_ARGS);
+                argsq = 0;
                 continue;
             } 
             if (strcmp(args[i], ">") == 0) {
@@ -96,7 +99,7 @@ int sepCmds(char **args, Command ** commands, int argq) { // Diferencia comandos
 
             }
             if (strcmp(args[i], "&&") == 0) {
-                argsq = 0;
+
                 Command commandFinished = (Command) malloc(sizeof(Command));
                 char ** cargs = malloc(sizeof(commandUnfinished->args));
                 copy_array(cargs, commandUnfinished->args, argsq);
@@ -110,6 +113,11 @@ int sepCmds(char **args, Command ** commands, int argq) { // Diferencia comandos
                 char * coutput = malloc(sizeof(commandUnfinished->output));
                 strcpy(coutput, commandUnfinished->output);
                 commandFinished->output = coutput;
+                commandFinished->argsq = argsq;
+                argsq = 0;
+
+                if (isPipe != 0) {commandFinished->pipe = 1;} 
+                    else {commandFinished->pipe = 0;}
 
                 if (commandUnfinished->input == 0) {
                     commandFinished->input = 0;
@@ -166,6 +174,8 @@ int sepCmds(char **args, Command ** commands, int argq) { // Diferencia comandos
     char * coutput = malloc(sizeof(commandUnfinished->output));
     strcpy(coutput, commandUnfinished->output);
     commandFinished->output = coutput;
+    commandFinished->argsq = argsq;
+
 
     if (commandUnfinished->input == 0) {
         commandFinished->input = 0;
@@ -173,7 +183,7 @@ int sepCmds(char **args, Command ** commands, int argq) { // Diferencia comandos
     if (commandUnfinished->jobRunType == BACKGROUND) {
         commandFinished->jobRunType = BACKGROUND;
     } else {commandFinished->jobRunType = FOREGROUND;}
-    
+    commandFinished->pipe = 0;
     commands = realloc(commands, sizeof(commands) + sizeof(commandFinished));
     commands[commandsq][isPipe] = commandFinished; 
 
