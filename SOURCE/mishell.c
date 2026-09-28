@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,6 +15,7 @@
 
 int tokenizar(char *line, char **args)
 {
+
     line[strcspn(line, "\n")] = 0; // Eliminar el salto de linea
 
     // aca tokenizamos el comando, determinando espacios, tabs y salto de linea
@@ -39,6 +39,7 @@ int JOBS = 0;
 
 int main(void)
 {
+    
     char cwd[1024];
 
     // inicializamos el arreglo de procesos para evitar acceder a memoria invalida
@@ -67,6 +68,7 @@ int main(void)
         line[strcspn(line, "\n")] = 0;
 
         int argc = tokenizar(line, args);
+        Command **commands = malloc(sizeof(Command) * 1024); // Arreglo que contiene comandos, pipes vienen como arreglos con c/cmd, comandos solos vienen en un arreglo solos
 
         //  verificamos que el usuario haya ingresado un comando
         // si solo presiona Enter, volvemos a mostrar el prompt
@@ -136,20 +138,20 @@ int main(void)
 
                 switch (processes[i]->status)
                 {
-                    case RUNNING:
+                case RUNNING:
                         status = "RUNNING";
-                        break;
+                    break;
 
-                    case STOPPED:
+                case STOPPED:
                         status = "STOPPED";
-                        break;
+                    break;
 
-                    case TERMINATED:
+                case TERMINATED:
                         status = "TERMINATED";
-                        break;
+                    break;
 
-                    default:
-                        break;
+                default:
+                    break;
                 }
 
                 long job_id = (long)processes[i]->job_id;
@@ -167,7 +169,7 @@ int main(void)
         }
 
         if (strcmp(args[0], "pmon") == 0)
-        {
+        { 
             // TODO: implementar monitor de procesos
             continue;
         }
