@@ -16,6 +16,8 @@ void copy_array(char **to, char **from, int n) {
     }
 }
 
+
+// Separa argumentos en comandos y pipes de comandos
 int sepCmds(char **args, struct Command *** commands, int argq) { // Diferencia comandos de argumentos
     const char* builtins[] = {"cd", "exit", "jobs", "pmon"};
     int builtinsq = 4;

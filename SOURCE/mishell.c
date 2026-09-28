@@ -76,6 +76,7 @@ int main(void)
         {
             continue;
         }
+        int commandQuantity = sepCmds(args, commands, argc);
 
         // TODO: integrar separateCommands para separar los comandos
         // cuando existan pipes o redirecciones
