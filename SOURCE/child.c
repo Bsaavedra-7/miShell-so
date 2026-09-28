@@ -8,7 +8,7 @@
 #include "validar.h" //  funciones para validar los comandos
 
 
-// Funcion para crear un proceso hijo (para que mishell->c no sea tan largo)
+// Funcion para ejecutar comandos builtin y otros comandos
 void execute(struct Command *** commands, Job ** processes, int comQuant) {
     for (int i = 0; i < comQuant; i++) {
         int j = 0;
