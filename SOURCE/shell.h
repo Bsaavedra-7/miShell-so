@@ -8,6 +8,7 @@
 #define MAX_JOBS 100 // maximo de trabajos que se pueden ejecutar al mismo tiempo
 #define MAX_ARGS 64 // maximo de argumentos que puede tener un comando
 #define MAX_LINE 1024 // maximo de caracteres que puede tener el comando
+#define MAX_ARG_LEN 30
 
 #define PIPE_READ 0 // Para uso en pipes creadas ej ptc[PIPE_READ] (parent to child) sera para leer contenido desde el padre al hijo
 #define PIPE_WRITE 1 // Para uso en pipes creadas, ver ej arriba
@@ -32,7 +33,10 @@ typedef struct {
     int ctp[2]; // pipe para comunicacion hijo a padre (podria servir?)
 }Job;
 
-
+typedef enum {
+    BACKGROUND,
+    FOREGROUND
+}JobRunType;
 
 //Estructura para representar un comando
 typedef struct {
@@ -40,7 +44,8 @@ typedef struct {
     char **args; // Argumentos 
     char **input; // entrada del comando, si no se define es NULL
     char **output; // salida del comando, si no se define es NULL y debe ir por consola
-    
+    JobRunType jobRunType; // Para diferenciar si es foreground o background
+
 }Command, *Command;
 
 
