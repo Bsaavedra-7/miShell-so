@@ -5,22 +5,42 @@
 #include <stdbool.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include "validar.h"
 
-// verificamos si la ruta corresponde a un archivo ejecutable
-bool es_ejecutable(const char *ruta)
+// verificamos si el comando es interno de nuestra shell
+bool es_interno(const char *comando)
+{
+    if (comando == NULL)
+        return false;
+
+    // estos comandos los implementamos nosotros
+    return strcmp(comando, "cd") == 0 ||
+           strcmp(comando, "exit") == 0 ||
+           strcmp(comando, "jobs") == 0 ||
+           strcmp(comando, "pmon") == 0;
+}
+
+// verificamos si existe el archivo y tiene permiso de ejecucion
+static bool es_ejecutable(const char *ruta)
 {
     struct stat info;
 
+    // comprobamos que sea un archivo regular ejecutable
     return stat(ruta, &info) == 0 &&
            S_ISREG(info.st_mode) &&
            access(ruta, X_OK) == 0;
 }
 
+// verificamos si el comando ingresado es valido
 bool es_comando(const char *comando)
 {
     // verificamos que el comando no este vacio
     if (comando == NULL || comando[0] == '\0')
         return false;
+
+    // primero verificamos nuestros comandos internos
+    if (es_interno(comando))
+        return true;
 
     // si tiene una ruta, verificamos directamente
     if (strchr(comando, '/') != NULL)
@@ -32,48 +52,52 @@ bool es_comando(const char *comando)
     if (path == NULL)
         return false;
 
-    char *copia = strdup(path);
+    const char *inicio = path;
 
-    if (copia == NULL)
-        return false;
-
-    char *resto = copia;
-    char *directorio;
-
-    // recorremos los directorios de PATH
-    while ((directorio = strsep(&resto, ":")) != NULL)
+    // recorremos cada directorio de PATH
+    while (1)
     {
-        // un directorio vacio representa el directorio actual
-        if (directorio[0] == '\0')
-            directorio = ".";
+        const char *fin = strchr(inicio, ':');
 
-        size_t largo = strlen(directorio) +
-                       strlen(comando) + 2;
+        size_t largo_dir = fin
+            ? (size_t)(fin - inicio)
+            : strlen(inicio);
+
+        // reservamos memoria para la ruta completa
+        size_t largo = largo_dir + strlen(comando) + 3;
 
         char *ruta = malloc(largo);
 
         if (ruta == NULL)
-        {
-            free(copia);
             return false;
+
+        if (largo_dir == 0)
+        {
+            // una entrada vacia representa el directorio actual
+            snprintf(ruta, largo, "./%s", comando);
+        }
+        else
+        {
+            // construimos la ruta del posible ejecutable
+            memcpy(ruta, inicio, largo_dir);
+            ruta[largo_dir] = '/';
+            strcpy(ruta + largo_dir + 1, comando);
         }
 
-        snprintf(ruta, largo, "%s/%s",
-                 directorio, comando);
-
-        // si encontramos el ejecutable, retornamos true
+        // verificamos si encontramos el ejecutable
         bool encontrado = es_ejecutable(ruta);
 
         free(ruta);
 
         if (encontrado)
-        {
-            free(copia);
             return true;
-        }
-    }
 
-    free(copia);
+        // si no quedan directorios, terminamos la busqueda
+        if (fin == NULL)
+            break;
+
+        inicio = fin + 1;
+    }
 
     // no encontramos el comando
     return false;
