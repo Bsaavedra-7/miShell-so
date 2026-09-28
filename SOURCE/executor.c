@@ -1,4 +1,10 @@
-
+#include "executor.h"
+#include "shell.h"
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/wait.h>
+#include <signal.h>
+#include <stdlib.h>
 
 /* 
 separateCommands.c = parser (texto → structs)
