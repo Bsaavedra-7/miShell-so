@@ -6,7 +6,8 @@
 #include "shell.h"
 #include "child.h"
 #include <signal.h>
-//#include <unistd.h>
+#include <unistd.h>
+#include "separateCommands.h"
 
 //  gcc mishell.c -o mishell
 //  ./mishell
@@ -32,6 +33,7 @@ int tokenizar(char *line, char **args)
     return i;
 }
 
+
 int JOBS = 0;
 
 int main(void)
@@ -43,7 +45,6 @@ int main(void)
 
     while (1)
     {
-
         if (getcwd(cwd, sizeof(cwd)) == NULL)
         {
             perror("getcwd() error");
@@ -61,7 +62,9 @@ int main(void)
 
         int argc = tokenizar(line, args);
 
-        // Si shell debe poder ejecutar cmd1 && cmd2 habra que hacer esto dentro de un ciclo
+        Command **commands = malloc(sizeof(Command) * 1024); // Arreglo que contiene comandos, pipes vienen como arreglos con c/cmd, comandos solos vienen en un arreglo solos
+
+        // Reemplazar llamados a comandos internos abajo
 
         if (strcmp(args[0], "cd") == 0)
         { // Comando es cd
@@ -73,7 +76,7 @@ int main(void)
             continue; // Salta al sgte ciclo IMPORTANTE
         }
 
-        if (strcmp(args[0], "exit") == 0)
+        if (strcmp(args[0], "exit") == 0) //TODO falta agregar codigo de salida
         {
             return 0;
         } // Cierra la shell
@@ -101,7 +104,7 @@ int main(void)
                     break;
                 }
 
-                printf("%ld, %s, %s", pid, cmd);
+                printf("%ld, %s, %s\n", pid, cmd);
                 free(status);
                 free(cmd);
                 continue;
