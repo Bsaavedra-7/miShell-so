@@ -4,7 +4,11 @@
 
 #include <stdbool.h>
 
-// verifica si existe un programa ejecutable
+// verificamos si el comando es interno de nuestra shell
+bool es_interno(const char *comando);
+
+// verificamos si es un comando valido
 bool es_comando(const char *comando);
 
 #endif
+
