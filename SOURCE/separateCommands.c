@@ -15,7 +15,7 @@ void copy_array(char **from, char **to, int n) {
     }
 }
 
-int sepCmds(char **args, Command *** commands, int argq) { // Diferencia comandos de argumentos
+int sepCmds(char **args, Command ** commands, int argq) { // Diferencia comandos de argumentos
     const char* builtins[] = {"cd", "exit", "jobs", "pmon"};
     int builtinsq = 4;
     commands[0] = (Command *)malloc(sizeof(Command*));
