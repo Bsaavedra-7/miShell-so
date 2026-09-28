@@ -3,13 +3,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
-#include <sys/wait.h> // AGREGADO: necesario para utilizar waitpid()
+#include <sys/wait.h> //  necesario para utilizar waitpid()
 #include "shell.h"
 #include "child.h"
 #include <signal.h>
 #include <unistd.h>
 #include "separateCommands.h"
-#include "validar.h" // AGREGADO: funciones para validar los comandos
+#include "validar.h" //  funciones para validar los comandos
 
 // gcc -Wall -Wextra -std=gnu11 -o mishell mishell.c validar.c
 // ./mishell
@@ -68,7 +68,7 @@ int main(void)
 
         int argc = tokenizar(line, args);
 
-        // AGREGADO: verificamos que el usuario haya ingresado un comando
+        //  verificamos que el usuario haya ingresado un comando
         // si solo presiona Enter, volvemos a mostrar el prompt
         if (argc == 0)
         {
@@ -82,7 +82,7 @@ int main(void)
 
         if (strcmp(args[0], "cd") == 0)
         {
-            // AGREGADO: si no se ingresa un directorio, usamos HOME
+            //  si no se ingresa un directorio, usamos HOME
             // esto evita que chdir reciba un argumento NULL
             char *directorio = args[1];
 
@@ -108,7 +108,7 @@ int main(void)
 
         if (strcmp(args[0], "exit") == 0)
         {
-            // AGREGADO: permitimos ingresar un codigo de salida
+            //  permitimos ingresar un codigo de salida
             // si no se ingresa ninguno, retornamos 0
             if (args[1] != NULL)
             {
@@ -124,7 +124,7 @@ int main(void)
 
             for (int i = 0; i < MAX_JOBS; i++)
             {
-                // AGREGADO: verificamos que exista un proceso
+                //  verificamos que exista un proceso
                 // antes de acceder a sus datos
                 if (processes[i] == NULL)
                 {
@@ -154,7 +154,7 @@ int main(void)
 
                 long job_id = (long)processes[i]->job_id;
 
-                // AGREGADO: mostramos el estado sin reservar memoria
+                //  mostramos el estado sin reservar memoria
                 // ya no necesitamos utilizar malloc ni free
                 printf("[%ld] %s %s\n",
                        job_id,
@@ -162,7 +162,7 @@ int main(void)
                        processes[i]->command);
             }
 
-            // AGREGADO: evitamos que jobs se ejecute como comando externo
+            //  evitamos que jobs se ejecute como comando externo
             continue;
         }
 
@@ -172,7 +172,7 @@ int main(void)
             continue;
         }
 
-        // AGREGADO: verificamos si el comando existe en Linux
+        //  verificamos si el comando existe en Linux
         // es_comando retorna true si encuentra un ejecutable valido
         // tambien reconoce los comandos internos de nuestra shell
         if (!es_comando(args[0]))
@@ -203,7 +203,7 @@ int main(void)
             execvp(args[0], args);
 
             // solo llegamos aca si execvp falla
-            // AGREGADO: aunque la validacion sea correcta,
+            //  aunque la validacion sea correcta,
             // el programa podria dejar de estar disponible
             perror(args[0]);
 
