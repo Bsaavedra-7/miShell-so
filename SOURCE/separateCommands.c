@@ -75,19 +75,19 @@ int sepCmds(char **args, struct Command *** commands, int argq) { // Diferencia 
                 continue;
             } 
             if (strcmp(args[i], ">") == 0) {
-                commandUnfinished.input = args[i + 1]; 
+                commandUnfinished.outfile = args[i + 1]; 
                 commandUnfinished.inputAppend = 0;
                 skipLoop = 1;
                 continue;
             }
             if (strcmp(args[i], ">>") == 0) {
-                commandUnfinished.input = args[i + 1];
+                commandUnfinished.appendfile = args[i + 1];
                 commandUnfinished.inputAppend = 1;
                 skipLoop = 1;
                 continue;
             }
             if (strcmp(args[i], "<") == 0) {
-                commandUnfinished.output = args[i + 1];
+                commandUnfinished.infile = args[i + 1];
                 skipLoop = 1;
                 continue;
             }
