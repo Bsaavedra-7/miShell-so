@@ -5,17 +5,18 @@
 #include "shell.h"
 #include <unistd.h>
 #include "separateCommands.h"
+#include "validar.h" //  funciones para validar los comandos
 
 
-// Funcion para crear un proceso hijo (para que mishell.c no sea tan largo)
-void execute(struct Command ** commands, Job * jobs, int comQuant) {
+// Funcion para crear un proceso hijo (para que mishell->c no sea tan largo)
+void execute(struct Command *** commands, Job ** processes, int comQuant) {
     for (int i = 0; i < comQuant; i++) {
         int j = 0;
-        struct Command * comms = commands[i];
+        struct Command ** comms = commands[i];
         while (1) {
-            struct Command command = comms[j];
-            if (strcmp(command.command, "cd") == 0) {
-                if (strcmp(command.args[0], "") == 0) {
+            struct Command * command = comms[j];
+            if (strcmp(command->command, "cd") == 0) {
+                if (strcmp(command->args[0], "") == 0) {
                     char * home = getenv("HOME");
                     if (home == NULL) {
                         printf("ERROR: No se encontro HOME\n");
@@ -26,8 +27,74 @@ void execute(struct Command ** commands, Job * jobs, int comQuant) {
                     }
                 }
             }
+
+            if (strcmp(command->command, "exit") == 0) {
+                if (strcmp(command->args[0], "") != 0) {
+                    return atoi(command->args[0]);
+                }
+                return 0;
+            }
+
             ++j;
-            if (command.pipe == 0) {break;}
+            if (command->pipe == 0) {break;}
+
+            
+            if (strcmp(command->args[0], "jobs") == 0) {
+            // TODO: registrar los procesos en background
+
+            for (int i = 0; i < MAX_JOBS; i++)
+            {
+                //  verificamos que exista un proceso
+                // antes de acceder a sus datos
+                if (processes[i] == NULL)
+                {
+                    continue;
+                }
+
+                // determinamos el estado del proceso registrado
+                const char *status = "UNKNOWN";
+
+                switch (processes[i]->status)
+                {
+                case RUNNING:
+                        status = "RUNNING";
+                    break;
+
+                case STOPPED:
+                        status = "STOPPED";
+                    break;
+
+                case TERMINATED:
+                        status = "TERMINATED";
+                    break;
+
+                default:
+                    break;
+                }
+
+                long job_id = (long)processes[i]->job_id;
+
+                //  mostramos el estado sin reservar memoria
+                // ya no necesitamos utilizar malloc ni free
+                printf("[%ld] %s %s\n",
+                       job_id,
+                       status,
+                       processes[i]->command);
+            }
+            continue;
+        }
+
+        if (strcmp(command->command, "pmon") == 0)
+        { 
+            // TODO: implementar monitor de procesos
+            continue;
+        }
+
+        if (!es_comando(command->command)) {
+            printf("Comando no enconrtrado: %s\n", command->command);
+            continue;
+        }
+
         }
 
     }

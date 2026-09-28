@@ -2,7 +2,10 @@
 #define CHILD_H
 #include "shell.h"
 #include <stdio.h>
+#include "separateCommands.h"
+#include <unistd.h>
+#include "shell.h"
 
-Job execute(char **args);
+void execute(struct Command *** commands, Job ** processes, int comQuant);
 
 #endif
