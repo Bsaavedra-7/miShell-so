@@ -146,19 +146,14 @@ static void setup_child_io(int in_fd, int out_fd, Command *cmd)
     }
 }
 
-
-//asegura que argv[0] = command, y que cmd->args termine en NULL
-char **build_argv(Command *cmd){
-
-    if (cmd->argsq == 0) {//array de punteros
-        char **single = malloc(sizeof(char*) * 2);
-        single[0] = cmd->command;
-        single[1] = NULL;
-        return single;
+static char **build_argv(Command *cmd) {
+    char **argv = malloc(sizeof(char) * (cmd->argsq + 2));
+    argv[0] = cmd->command;                   
+    for (int i = 0; i < cmd->argsq; i++) {
+        argv[i + 1] = cmd->args[i];            
     }
-    cmd->args[cmd->argsq] = NULL;
-    return cmd->args;
-
+    argv[cmd->argsq + 1] = NULL;               
+    return argv;
 }
 
 
