@@ -45,7 +45,6 @@ int main(void)
 
     while (1)
     {
-
         if (getcwd(cwd, sizeof(cwd)) == NULL)
         {
             perror("getcwd() error");
@@ -65,18 +64,6 @@ int main(void)
 
         Command **commands = NULL;
         int ncmds = sepCmds(args, &commands, argc);
-
-        // DEBUG TEMPORAL- ver que parseo se hizo
-        for (int i = 0; i < ncmds; i++) {
-            for (int j = 0; commands[i][j]; j++) {
-                Command *c = commands[i][j];
-                printf("DEBUG: pipe[%d][%d] cmd='%s' argsq=%d pipe=%d\n",
-                    i, j, c->command, c->argsq, c->pipe);
-                for (int k = 0; k < c->argsq; k++) {
-                    printf("  arg[%d]='%s'\n", k, c->args[k]);
-                }
-            }
-        }
 
         // Si shell debe poder ejecutar cmd1 && cmd2 habra que hacer esto dentro de un ciclo
 
@@ -130,7 +117,7 @@ int main(void)
             continue;
         }
         if (ncmds > 0) {
-            int background = (commands[ncmds-1][0]->jobRunType == BACKGROUND);
+            int background = (commands[ncmds-1][0].jobRunType == BACKGROUND);
             int ret = execute_pipeline(commands, ncmds, background);
             free_commands(commands, ncmds);
         }
