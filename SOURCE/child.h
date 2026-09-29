@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include "separateCommands.h"
 #include <unistd.h>
+#include <sys/types.h>
 #include "shell.h"
 
 void execute(struct Command *** commands, Job ** processes, int comQuant);

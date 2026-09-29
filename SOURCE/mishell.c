@@ -7,8 +7,8 @@
 #include "child.h"
 #include <signal.h>
 #include <unistd.h>
-#include "executor.h" 
-#include "separateCommands.h"  
+#include "executor.h"   
+#include "separateCommands.h" 
 
 //  gcc mishell.c -o mishell
 //  ./mishell
@@ -40,7 +40,7 @@ int main(void)
 {
     
     char cwd[1024];
-    Job *processes = malloc(sizeof(char*) * MAX_JOBS);
+    Job *processes[MAX_JOBS] = {NULL};// por esto fallaba, no estaba inicializadp
     char *args[MAX_ARGS];
 
     while (1)
@@ -62,17 +62,102 @@ int main(void)
         line[strcspn(line, "\n")] = 0;
 
         int argc = tokenizar(line, args);
-        Command **commands = malloc(sizeof(char* /*cualquier puntero servia*/) * MAX_COMMANDS_IN_LINE); // Arreglo que contiene comandos, pipes vienen como arreglos con c/cmd, comandos solos vienen en un arreglo solos
-        //  verificamos que el usuario haya ingresado un comando
-        // si solo presiona Enter, volvemos a mostrar el prompt
-        if (argc == 0)
+
+        Command **commands = NULL;
+        int ncmds = sepCmds(args, &commands, argc);
+
+        // DEBUG TEMPORAL- ver que parseo se hizo
+        for (int i = 0; i < ncmds; i++) {
+            for (int j = 0; commands[i][j]; j++) {
+                Command *c = commands[i][j];
+                printf("DEBUG: pipe[%d][%d] cmd='%s' argsq=%d pipe=%d\n",
+                    i, j, c->command, c->argsq, c->pipe);
+                for (int k = 0; k < c->argsq; k++) {
+                    printf("  arg[%d]='%s'\n", k, c->args[k]);
+                }
+            }
+        }
+
+        // Si shell debe poder ejecutar cmd1 && cmd2 habra que hacer esto dentro de un ciclo
+
+        if (strcmp(args[0], "cd") == 0)
+        { // Comando es cd
+
+            if (chdir(args[1]) == -1)
+            { // Cambia directorio, si falla retorna -1
+                printf("ERROR AL CAMBIAR DIRECTORIO");
+            }
+            continue; // Salta al sgte ciclo IMPORTANTE
+        }
+
+        if (strcmp(args[0], "exit") == 0)
         {
+            return 0;
+        } // Cierra la shell
+
+        if (strcmp(args[0], "jobs") == 0)
+        { // TODO falta testear, no se si funcione en realidad
+
+            for (int i = 0; i < MAX_JOBS; i++)
+            {
+                char *status = malloc(256), *cmd = malloc(256);
+                strcpy(cmd, processes[i]->command); // TODO puede que tire error al 2do arg no ser const char *
+                long pid = (long)processes[i]->job_id;
+                switch (processes[i]->status)
+                { // Unica forma que se de usar los nombres de los enum, quizas agregandoles un valor que sea su nombre??
+                case RUNNING:
+                    strcpy(status, "RUNNING");
+                    break;
+                case STOPPED:
+                    strcpy(status, "STOPPED");
+                    break;
+                case TERMINATED:
+                    strcpy(status, "TERMINATED");
+                    break;
+                default:
+                    break;
+                }
+
+                printf("%ld, %s, *char", pid, cmd);
+                free(status);
+                free(cmd);
+                continue;
+            }
+        }
+
+        if (strcmp(args[0], "pmon") == 0)
+        { 
             continue;
         }
-        int commandQuantity = sepCmds(args, commands, argc);
+        if (ncmds > 0) {
+            int background = (commands[ncmds-1][0]->jobRunType == BACKGROUND);
+            int ret = execute_pipeline(commands, ncmds, background);
+            free_commands(commands, ncmds);
+        }
+        continue;
 
-        execute(commands, processes, commandQuantity);
+        pid_t pid = fork();
 
+        if (pid < 0)    
+        {
+            perror("fork");
+            continue;
+        }
+
+        if (pid == 0)
+        {
+            // hijo: restaurar señales
+            execvp(args[0], args);
+            perror(args[0]); // solo llega si execvp falla
+            exit(1);
+        }
+        
+        else
+        {
+            // padre: registrar job si es background, waitpid si es foreground
+            // (waitpid por ahora, & se implementa en R5)
+            waitpid(pid, NULL, 0);
+        }
     }
 
     return 0;
