@@ -1,6 +1,8 @@
 #ejecutable principal
 mishell
-
+# ejecutables de prueba
+SOURCE/shell
+SOURCE/test
 *.o
 
 *.swp
