@@ -19,11 +19,9 @@ void copy_array(char **to, char **from, int n) {
 
 // Separa argumentos en comandos y pipes de comandos
 int sepCmds(char **args, Command *** commands, int argq) { // Diferencia comandos de argumentos
-    const char* builtins[] = {"cd", "exit", "jobs", "pmon"};
-    int builtinsq = 4;
     Command commandUnfinished; // para despues hacer malloc y añadirlo al array
     commandUnfinished.jobRunType = FOREGROUND;
-    int commandsq = 0, endOfCommand = 0, isPipe = 0, skipLoop = 0, nextCommandisBackground = 0;
+    int commandsq = 0, isPipe = 0, skipLoop = 0;
     int argsq = 0; // variable para contar argumentos de cada comando
     char **commandArgs = (char **) malloc(sizeof(char **) * MAX_ARGS);
     // inicializacion de instancia 

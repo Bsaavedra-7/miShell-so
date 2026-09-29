@@ -45,15 +45,20 @@ void execute(struct Command *** commands, Job ** processes, int comQuant) {
             } else {
                 if(chdir(command->args[0]) == -1) {
                     perror("ERROR AL CAMBIAR DIRECTORIO");
-                }
+                    continue;
+                } else {continue;}
             }
+            continue;
         }
 
         if (strcmp(command->command, "exit") == 0) {
-            if (strcmp(command->args[0], "") != 0) {
-                exit(atoi(command->args[0]));
+            if (command->args[0] != NULL) {
+                if (strcmp(command->args[0], "") != 0) {
+                    exit(atoi(command->args[0]));
+                }
+            } else {
+                exit(0);
             }
-
         }
 
         if (strcmp(command->command, "jobs") == 0) {
@@ -117,7 +122,7 @@ void execute(struct Command *** commands, Job ** processes, int comQuant) {
             ++j;
         }
 
-        int ret = execute_pipeline(comms, j, processes);
+        execute_pipeline(comms, j, processes);
         free_commands(comms, j);
         if (command->pipe == 0) {break;}
 

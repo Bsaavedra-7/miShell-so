@@ -65,7 +65,7 @@ int execute_pipeline(struct Command **pipeline, int ncmds, Job **processes)
             }
 
             // cierra fds que no usa el proceso hijo
-            if (prev_fd != -1) close(prev_fd);
+
             if (!is_last) {
                 close(pipefd[0]);  // evita el deadlock, el hijo no lee del pipe
             }
