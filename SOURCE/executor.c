@@ -6,6 +6,7 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "child.h"
 
 //para edtener o prevenir errores
 static void setup_child_io(int in_fd, int out_fd, Command *cmd);
@@ -18,16 +19,21 @@ mishell.c = orquestador (loop + builtins + signals)
 */
 
 // esta funcion recibe el pipeline parseado, y crea lkos procesos hijos, conecta pipes y decide si es foreground o background
-int execute_pipeline(struct Command **pipeline, int ncmds, int background)
+int execute_pipeline(struct Command **pipeline, int ncmds, Job **processes)
 {
 
     pid_t pids[ncmds];
     int pipefd[2];
     int prev_fd = -1; // lector del pipe ante3rior
+    int background;
+    if (pipeline[ncmds - 1]->jobRunType == BACKGROUND) {
+        background = 1;
+    } else {background = 0;}
 
     for (int i = 0; i < ncmds; i++)
     {
         Command *cmd = pipeline[i];
+
         int is_last = (i == ncmds - 1);
 
         // si no es ultimo comando crear pipe
@@ -88,7 +94,7 @@ int execute_pipeline(struct Command **pipeline, int ncmds, int background)
     if (background)
     {
         // Registrar job con pids y cmdline
-        job_add(pids, ncmds, pipeline);
+        job_add(pids, pipeline, processes);
         return pids[ncmds - 1];
     }
     else

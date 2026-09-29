@@ -62,89 +62,12 @@ int main(void)
 
         int argc = tokenizar(line, args);
 
-        Command **commands = NULL;
-        int ncmds = sepCmds(args, &commands, argc);
+        Command ***commands = malloc(sizeof(Command***) * MAX_COMMANDS_IN_LINE);
+        int ncmds = sepCmds(args, commands, argc);
 
-        // Si shell debe poder ejecutar cmd1 && cmd2 habra que hacer esto dentro de un ciclo
+        execute(commands, processes, ncmds);
 
-        if (strcmp(args[0], "cd") == 0)
-        { // Comando es cd
-
-            if (chdir(args[1]) == -1)
-            { // Cambia directorio, si falla retorna -1
-                printf("ERROR AL CAMBIAR DIRECTORIO");
-            }
-            continue; // Salta al sgte ciclo IMPORTANTE
-        }
-
-        if (strcmp(args[0], "exit") == 0)
-        {
-            return 0;
-        } // Cierra la shell
-
-        if (strcmp(args[0], "jobs") == 0)
-        { // TODO falta testear, no se si funcione en realidad
-
-            for (int i = 0; i < MAX_JOBS; i++)
-            {
-                char *status = malloc(256), *cmd = malloc(256);
-                strcpy(cmd, processes[i]->command); // TODO puede que tire error al 2do arg no ser const char *
-                long pid = (long)processes[i]->job_id;
-                switch (processes[i]->status)
-                { // Unica forma que se de usar los nombres de los enum, quizas agregandoles un valor que sea su nombre??
-                case RUNNING:
-                    strcpy(status, "RUNNING");
-                    break;
-                case STOPPED:
-                    strcpy(status, "STOPPED");
-                    break;
-                case TERMINATED:
-                    strcpy(status, "TERMINATED");
-                    break;
-                default:
-                    break;
-                }
-
-                printf("%ld, %s, *char", pid, cmd);
-                free(status);
-                free(cmd);
-                continue;
-            }
-        }
-
-        if (strcmp(args[0], "pmon") == 0)
-        { 
-            continue;
-        }
-        if (ncmds > 0) {
-            int background = (commands[ncmds-1][0].jobRunType == BACKGROUND);
-            int ret = execute_pipeline(commands, ncmds, background);
-            free_commands(commands, ncmds);
-        }
         continue;
-
-        pid_t pid = fork();
-
-        if (pid < 0)    
-        {
-            perror("fork");
-            continue;
-        }
-
-        if (pid == 0)
-        {
-            // hijo: restaurar señales
-            execvp(args[0], args);
-            perror(args[0]); // solo llega si execvp falla
-            exit(1);
-        }
-        
-        else
-        {
-            // padre: registrar job si es background, waitpid si es foreground
-            // (waitpid por ahora, & se implementa en R5)
-            waitpid(pid, NULL, 0);
-        }
     }
 
     return 0;

@@ -208,9 +208,6 @@ int sepCmds(char **args, Command *** commands, int argq) { // Diferencia comando
     commandUnfinished.infileAppend = 0;
     commandUnfinished.jobRunType = FOREGROUND;
     commandUnfinished.outfile = "";
-    Command* a = commands[0][1];
-    Command* b = commands[1][0];
-
     return commandsq;
     
 }

@@ -6,7 +6,7 @@
 
 
 
-int execute_pipeline(struct Command **pipeline, int ncmds, int background);
+int execute_pipeline(struct Command **pipeline, int ncmds, Job **processes);
 
 //libera la memoria
 void free_commands(struct Command **cmds, int ncmds);
