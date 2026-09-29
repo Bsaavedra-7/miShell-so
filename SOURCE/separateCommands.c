@@ -148,6 +148,7 @@ int sepCmds(char **args, Command *** commands, int argq) { // Diferencia comando
 
         } else { // Si es comando
             argsq = 0;
+            //if (strcmp(args[i], "cd") == 0) {commandUnfinished.args[0] = "";}
             if (isPipe == 0) {
                 commands[commandsq] =  (Command **) malloc(sizeof(Command*) * MAX_COMMANDS_IN_LINE);
                 ++commandsq;

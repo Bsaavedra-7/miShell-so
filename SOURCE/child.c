@@ -33,13 +33,17 @@ void execute(struct Command *** commands, Job ** processes, int comQuant) {
         struct Command ** comms = commands[i];
         struct Command * command = comms[0];
         if (strcmp(command->command, "cd") == 0) {
-            if (strcmp(command->args[0], "") == 0) {
+            if (command->args[0] == NULL) {
                 char * home = getenv("HOME");
                 if (home == NULL) {
                     printf("ERROR: No se encontro HOME\n");
                     continue;
                 }
                 if(chdir(home) == -1) {
+                    perror("ERROR AL CAMBIAR DIRECTORIO");
+                }
+            } else {
+                if(chdir(command->args[0]) == -1) {
                     perror("ERROR AL CAMBIAR DIRECTORIO");
                 }
             }
@@ -52,11 +56,7 @@ void execute(struct Command *** commands, Job ** processes, int comQuant) {
 
         }
 
-        if (command->pipe == 0) {break;}
-
-        
-        if (strcmp(command->args[0], "jobs") == 0) {
-        // TODO: registrar los procesos en background
+        if (strcmp(command->command, "jobs") == 0) {
 
         for (int i = 0; i < MAX_JOBS; i++)
         {
@@ -119,8 +119,7 @@ void execute(struct Command *** commands, Job ** processes, int comQuant) {
 
         int ret = execute_pipeline(comms, j, processes);
         free_commands(comms, j);
-
-        
+        if (command->pipe == 0) {break;}
 
     }
 
